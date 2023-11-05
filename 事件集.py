@@ -5,6 +5,10 @@ from 谓词集 import *
 def EBP(状态集: 状态集, e: int, f: int):  # 电梯e内f层按钮被按下
     if not 状态集.EB[e][f] and not V(状态集, e, f):
         状态集.EB[e][f] = True
+        if 状态集.EF[e] < f:
+            状态集.M[e][f][1] = True
+        elif 状态集.EF[e] > f:
+            状态集.M[e][f][0] = True
 
 
 def EAF(状态集: 状态集, e: int, f: int):  # 电梯e到达f层
@@ -16,6 +20,9 @@ def FBP(状态集: 状态集, d: int, f: int):  # f层向d方向按钮被按下
     # S(状态集，e, f, d)的或运算,e的范围为状态集中电梯的个数
     if not 状态集.FB[f][d] and not any([S(状态集, e, f, d) for e in range(len(状态集.S))]):
         状态集.FB[f][d] = True
+        #让距离f层最近的且沿d方向可以到达f层的一台电梯开始运行,或者让处于等待状态的一台电梯向f层运行
+
+
 
 
 def EAFF(状态集: 状态集, f: int):  # 有电梯到达f层
