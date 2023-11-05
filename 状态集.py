@@ -7,6 +7,9 @@ class 状态集:
         self.FB = None
         self.EB = None
         self.EF = None
+        self.EE = None
+        self.EW = None
+        self.D = None
 
     def 设置状态集(self, m: int, n: int):
         # 电梯内按钮状态,默认均为False,False表示未按下,True表示按下,EB[i][j]为True表示电梯i内请求到j层的按钮亮起
@@ -21,3 +24,9 @@ class 状态集:
         self.W = [[False for _ in range(n)] for _ in range(m)]
         # 电梯位置,默认均为0,EF[i]为0表示电梯i停在第0层
         self.EF = [0 for _ in range(n)]
+        # 电梯当前路径候选楼层,默认均为False,False表示未被选中,True表示被选中,EE[i][j]为True表示电梯i的路径中包含第j层
+        self.EE = [[False for _ in range(n)] for _ in range(m)]
+        # 电梯非当前路径候选楼层，默认均为False，False表示未被选中，True表示被选中，EW[i][j]为True表示电梯i的非当前路径中包含第j层
+        self.EW = [[False for _ in range(n)] for _ in range(m)]
+        # 电梯当前运行方向，默认为-1，表示电梯处于等待状态，0表示向下，1表示向上
+        self.D = [-1 for _ in range(n)]
