@@ -25,11 +25,11 @@ def EAFF(状态集: 状态集, f: int):  # 有电梯到达f层
 
 
 def DC(状态集: 状态集, e: int, f: int):  # 电梯e在楼层f关门
-    if 状态集.S[e][f][0]:
+    if S(状态集, e, f, 0):
         状态集.M[e][f - 1][0] = True
-    elif 状态集.S[e][f][1]:
+    elif S(状态集, e, f, 1):
         状态集.M[e][f + 1][1] = True
-    elif 状态集.S[e][f][-1]:
+    elif S(状态集, e, f, -1):
         状态集.W[e][f] = True
 
 
