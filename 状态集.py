@@ -26,8 +26,8 @@ class 状态集:
         self.M = [[[False for _ in range(n)] for _ in range(m)] for _ in range(2)]
         # 电梯状态,默认均为False,False表示未运行,True表示运行,S[i][j][k]为True表示电梯i停在第j层，将朝k方向移动(尚未关门),k的值为0或1,0表示向下,1表示向上
         self.S = [[[False for _ in range(n)] for _ in range(m)] for _ in range(2)]
-        # 电梯状态,默认均为False,False表示未运行,True表示运行,W[i][j]为True表示电梯i停在第j层等待(已关门)
-        self.W = [[False for _ in range(n)] for _ in range(m)]
+        # 电梯状态,默认均为0,0表示电梯e在楼层f关门,1表示电梯在当前楼层开门,此状态表示电梯停止运行时的状态
+        self.W = [[0 for _ in range(n)] for _ in range(m)]
         # 电梯位置,默认均为0,EF[i]为0表示电梯i停在第0层
         self.EF = [0 for _ in range(n)]
         # 电梯当前路径候选楼层,默认均为False,False表示未被选中,True表示被选中,EE[i][j]为True表示电梯i的路径中包含第j层

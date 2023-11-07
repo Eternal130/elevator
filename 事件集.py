@@ -26,18 +26,52 @@ def EBP(状态集: 状态集, e: int, f: int):  # 电梯e内f层按钮被按下
                 状态集.S[1][f][e] = True
                 状态集.M[1][状态集.EF[e] + 1][e] = True
                 状态集.EE[f][e] = True
+                状态集.D[e] = 1
+                # print(状态集.D[e])
             else:
                 状态集.S[0][f][e] = True
                 状态集.M[0][状态集.EF[e] - 1][e] = True
                 状态集.EE[f][e] = True
+                状态集.D[e] = 0
 
 
 def EAF(状态集: 状态集, e: int, f: int):  # 电梯e到达f层
     if 状态集.EB[f][e]:
         状态集.EB[f][e] = False
+    # 状态集.EF[e] = f
+    # if 状态集.D[e] != -1:
+    #     状态集.FB[f][状态集.D[e]] = False
+    # 状态集.EF[e] = f
+    # 状态集.M[0][f][e] = False
+    # 状态集.M[1][f][e] = False
     # 电梯e的当前路径候选楼层和非当前路径候选楼层中删除f层
     状态集.EE[f][e] = False
     状态集.EW[f][e] = False
+    # 如果电梯e的当前路径候选楼层为空，则将电梯e非当前路径候选楼层和电梯e当前路径候选楼层交换
+    if not any(row[e] for row in 状态集.EE):
+        for k in range(状态集.f):
+            状态集.EE[k][e] = 状态集.EW[k][e]
+        if not any(row[e] for row in 状态集.EE):  # 如果交换后电梯e的当前路径候选楼层仍为空，则电梯在此处停止运行
+            状态集.D[e] = -1
+            状态集.W[f][e] = 1
+            状态集.M[0][f][e] = False
+            状态集.M[1][f][e] = False
+            状态集.S[0][f][e] = False
+            状态集.S[1][f][e] = False
+        else:  # 根据电梯e当前所处楼层和电梯e当前路径候选楼层中与当前楼层最近的楼层确定电梯e的运行方向
+            if 状态集.EF[e] < min([i for i in range(状态集.f) if 状态集.EE[i][e]]):
+                状态集.D[e] = 1
+            else:
+                状态集.D[e] = 0
+            状态集.FB[状态集.EF[e]][状态集.D[e]] = False
+            # 电梯e的位置改为当前方向的下一个楼层
+            # 状态集.EF[e] += 1 if 状态集.D[e] > 0 else -1
+
+    else:
+        状态集.S[状态集.D[e]][f][e] = True
+        状态集.W[f][e] = 1
+        状态集.FB[状态集.EF[e]][状态集.D[e]] = False
+        # 状态集.EF[e] += 1 if 状态集.D[e] > 0 else -1
 
 
 def FBP(状态集: 状态集, d: int, f: int):  # f层向d方向按钮被按下
@@ -61,6 +95,11 @@ def FBP(状态集: 状态集, d: int, f: int):  # f层向d方向按钮被按下
             e_list.sort(key=lambda x: abs(状态集.EF[x] - f))
             # 向e_list[0]电梯的当前路径候选楼层添加f层
             状态集.EE[f][e_list[0]] = True
+            # 根据当前电梯的位置设置电梯方向
+            if 状态集.EF[e_list[0]] < f:
+                状态集.D[e_list[0]] = 1
+            else:
+                状态集.D[e_list[0]] = 0
 
 
 def EAFF(状态集: 状态集, f: int):  # 有电梯到达f层
@@ -75,7 +114,7 @@ def DC(状态集: 状态集, e: int, f: int):  # 电梯e在楼层f关门
     elif S(状态集, e, f, 1):
         状态集.M[1][f + 1][e] = True
     elif S(状态集, e, f, -1):
-        状态集.W[f][e] = True
+        状态集.W[f][e] = 0
 
 
 def ST(状态集: 状态集, e: int, f: int):  # 电梯e靠近f层时触发传感器，电梯控制器决定是否在当前楼层停下
@@ -92,8 +131,16 @@ def ST(状态集: 状态集, e: int, f: int):  # 电梯e靠近f层时触发传�
             状态集.M[d][f][e] = False
             状态集.M[d][f + 1 if d > 0 else f - 1][e] = True
             状态集.S[d][f][e] = False
-            状态集.W[f][e] = False
+            状态集.W[f][e] = 0
 
 
 def elevator_update(状态集: 状态集):
-    pass
+    for e in range(状态集.e):
+        if 状态集.W[状态集.EF[e]][e] == 1:
+            状态集.W[状态集.EF[e]][e] = 0
+        else:
+            if any(row[e] for row in 状态集.EE):
+                状态集.EF[e] += 1 if 状态集.D[e] > 0 else -1 if 状态集.D[e] == 0 else 0
+                if 状态集.EE[状态集.EF[e]][e]:
+                    # 状态集.W[状态集.EF[e]][e] = 1
+                    EAF(状态集, e, 状态集.EF[e])

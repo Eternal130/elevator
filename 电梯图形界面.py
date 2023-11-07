@@ -41,7 +41,7 @@ class ElevatorGUI:
         for i in range(num_elevators):
             elevator_buttons = []
             for j in range(num_floors):
-                button = tk.Button(TL, text=f'EB {i + 1}-{j + 1}', command=partial(self.press_button, 状态集, i, j, False))
+                button = tk.Button(TL, text=f'EB {i + 1}-{j + 1}', command=partial(self.press_button, self.状态集, i, j, False))
                 button.grid(row=num_floors - j, column=i + 1)
                 elevator_buttons.append(button)
             self.elevator_buttons.append(elevator_buttons)
@@ -54,7 +54,7 @@ class ElevatorGUI:
                     button = tk.Button(root, text=f'FB {i + 1}' + ('上' if j > 0 else '下'), state=tk.DISABLED)
                 else:
                     button = tk.Button(root, text=f'FB {i + 1}' + ('上' if j > 0 else '下'),
-                                       command=partial(self.press_button, 状态集, i, j, True))
+                                       command=partial(self.press_button, self.状态集, i, j, True))
                 button.grid(row=num_floors - i, column=num_elevators + 1 + j)
                 floor_buttons.append(button)
             self.floor_buttons.append(floor_buttons)
@@ -62,9 +62,35 @@ class ElevatorGUI:
     def press_button(self, 电梯状态, i: int, j: int, isFloor: bool):
         if isFloor:
             FBP(电梯状态, j, i)
-        else:
-            EBP(电梯状态, i, j)
+            #当楼层j某个方向按钮状态为True时,高亮图形界面上的按钮
 
-    def draw_room_lable(self):
+            if 电梯状态.FB[i][j]:
+                self.floor_buttons[i][j]['state'] = tk.ACTIVE
+            # print(f'FBP {i + 1} {j + 1}')
+        else:
+            # print(电梯状态.D[i])
+            EBP(电梯状态, i, j)
+            #当电梯i内某个按钮状态为True时,修改图形界面上的按钮状态为亮起
+            if 电梯状态.EB[j][i]:
+                self.elevator_buttons[i][j]['state'] = tk.ACTIVE
+            # print(电梯状态.D[i])
+            # print(f'EBP {i + 1} {j + 1}')
+
+    def draw_room_label(self):
+        # print('awa')
+        # elevator_update(self.状态集)
         for i in range(self.num_elevators):
-            self.rooms[self.状态集.EF[i]][i]['text'] = '▼' if self.状态集.D[i] == 0 else '▲' if self.状态集.D[i] == 1 else '●'
+            for j in range(self.num_floors):
+                if self.状态集.EF[i] == j:
+                    #当电梯i当前楼层在其当前位置候选楼层时,显示●,如果电梯在当前楼层开门,显示○,否则显示▲或▼
+                    if self.状态集.W[self.状态集.EF[i]][i] == 1:
+                        self.rooms[j][i]['text'] = '○'
+                    elif self.状态集.D[i] == -1:
+                        self.rooms[j][i]['text'] = '●'
+                    else:
+                        self.rooms[j][i]['text'] = '▼' if self.状态集.D[i] == 0 else '▲'
+                    # self.rooms[j][i]['text'] = '▼' if self.状态集.D[i] == 0 else '▲' if self.状态集.D[i] == 1 else '●' if self.状态集.W[self.状态集.EF[i]][i] == 0 else '○'
+                    # self.rooms[j][i]['text'] = '○' if self.状态集.W[self.状态集.EF[i]][i] == 1 else '●' if self.状态集.EE[self.状态集.EF[i]][i] == 1 else '▼' if self.状态集.D[i] == 0 else '▲' if self.状态集.D[i] == -1 else '▲' if self.状态集.D[i] == 1 else '●'
+                else:
+                    self.rooms[j][i]['text'] = '0'
+        elevator_update(self.状态集)
